@@ -1,0 +1,196 @@
+PageRouter
+React Router처럼 페이지 라우팅 기능을 제공함
+pages 폴더의 구조를 기반으로 페이지를 라우팅해줌
+pages 폴더 아래에 index.js about.js item.js 이런식으로 자바스크립트 파일들을 저장하면 자동으로 이 파일들의 경로와 이름에 따라서 페이지 라우팅이 제공됨
+index.js는 ~/
+about.js는 ~/about
+item.js는 ~/item 경로에 맞춰서 pages폴더 아래에 작성된 about,item이라는 자바스크립트 파일에 작성된 컴포넌트가 페이지로써 렌더링이됨
+
+Next.js의 페이지 라우터는 pages폴더 아래에 들어있는 파일들의 이름을 기반으로 페이지 라우팅을 자동으로 제공해줌
+파일 이름뿐만 아니라 폴더 이름을 기준으로도 페이지 라우팅을 할 수 있음
+
+pages/about/index.js ~/about
+pages/item/index.js ~/item
+이때도 pages아래에 item.js파일이 없으니까 대신에 item 폴더 밑에 있는 index.js파일의 컴포넌트를 페이지로써 렌더링 시켜주게됨
+
+페이지 라우터에서는 동적경로(Dynamic Routes) ~/item/1, ~/itemt/2 ... , ~/item/100 를 갖는 페이지 라우팅도 굉장히 간단하게 설정해 줄 수가 있음 
+
+Next.js의 페이지 라우터에서 동적 경로에 대응하는 페이지를 만들고 싶다면 
+pages/item/[id].js
+아이템 폴더 아래에 [id].js 라는 파일을 만들어 주면 됨 
+파일명을 [] 대괄호로 묶어주게 되면 이 파일은 이제 동적 경로에 대응하는 페이지의 역할을 할 수 있게됨
+
+Next.js의 Page Router는
+Pages 폴더의 구조를 기반으로 페이지 라우팅을 제공함
+
+
+npx create-next-app@14 section02
+
+_app.tsx, _documents.tsx는 page폴더 밑에 있지만 페이지의 역할을 하는 파일들은 아님
+대신에 넥스트 앱의 모든 페이지에 공통적으로 적용될 로직 or 공통적으로 적용될 레이아웃 또는 데이터를 다루기 위해 필요한 파일들임
+
+_app.tsx는 리액트의 앱 컴포넌트와 동일한 역할을 함
+리액트의 앱 컴포넌트 - 모든 컴포넌트들의 부모역할을 함, 루트 컴포넌트로서 존재함
+넥스트의 앱 컴포넌트 - 루트 컴포넌트의 역할을 한다! 모든 페이지역할을 하는 컴포넌트들의 부모컴포넌트가 된다
+
+넥스트의 _app.tsx에서는 Components와 pageProps라는 두개의 프롭스를 받고있음
+Components는 페이지역할을 할 컴포넌트를 받음
+pageProps는 Components에 전달될 페이지의 프롭스들을 모두 객체로 보관한 거라고 보면됨
+
+export default function App({ Component, pageProps }: AppProps) {
+  return <Component {...pageProps} />;
+}
+리턴문을 보면 페이지 역할을 할 Component를 렌더링 하면서 동시에 props는 pageProps를 전달 받은걸 그대로 구조분해할당으로 흩뿌려서 전달하고 있음
+
+결론적으로 Next.js에서는 어떤 페이지를 렌더링하던 간에 앱컴포넌트 밑에 페이지 역할을 하는 컴포넌트가 렌더링되는 구조로 렌더링이 됨 
+
+모든 페이지에 필요한 헤더같은 공통 요소가 필요하다면 _app.tsx 컴포넌트의 리턴문안에 추가해 주면 됨
+
+import "@/styles/globals.css";
+import type { AppProps } from "next/app";
+
+export default function App({ Component, pageProps }: AppProps) {
+  return (
+    <>
+      <header>헤더</header>
+      <Component {...pageProps} />;
+    </>
+  );
+}
+
+이렇게 리턴문 안에 header태그 추가해서 헤더 라고 쓰면 
+test페이지 위에 글로벌 헤더가 나타나 있음
+
+index페이지 에서도 글로벌 헤더가 잘 렌더링되고 있음
+
+
+Next.js의 _app.tsx 앱컴포넌트는 모든 페이지 컴포넌트들의 부모 역할을 하는 Next앱의 루트 컴포넌트이므로 전체 페이지에 공통적으로 포함되는 헤더컴포넌트 혹은 레이아웃을 렌더링한다거나 그런 공간이다!
+
+
+_document.tsx
+이 컴포넌트의 역할은 모든 페이지에 공통적으로 적용이 되어야 하는 Next.js앱의 HTML코드를 설정하는 컴포넌트임
+
+사실상 기존의 리액틔 앱에 index.html과 거의 비슷한 역할을 한다고 생각하면됨
+
+import { Html, Head, Main, NextScript } from "next/document";
+
+export default function Document() {
+  return (
+    <Html lang="en">
+      <Head />
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  );
+}
+여기서 lang를 kr로 바꿔주게 되면 f12 눌러서 elements를 보면 lang속성이 kr로 변경됨
+
+다큐먼트 컴포넌트 또한 모든 페이지에 적용이 되는 컴포넌트이기 때문에 테스트 페이지로 이동해서 봐도 똑같이 html의 lang이 kr로 변경된걸 볼수있음 
+
+그래서 다큐먼트라는 컴포넌트는 모든 페이지에 적용이 되어야 하는 메타태그를 설정하거나 또는 폰트를 불러오거나 캐릭터셋을 설정하거나 구글 애널리틱스같은 서드 파티 스크립트를 넣는다거나 등등 페이지 전체에 다 적용되는 HTML 태그를 관리하기 위해 사용된다.
+
+마지막으로
+next.config.mjs 이 파일은 넥스트 앱의 설정을 관리하는 파일임
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+};
+
+export default nextConfig;
+
+ reactStrictMode 이걸 실습을 위해 false로 꺼줄거임
+개발모드를 실행했을때 컴포넌트를 두번이나 실행시킴
+그래서 콘솔을 찍는다거나 할때 디버깅하기가 불편함 그래서 false로 꺼줄거임
+
+
+/search/setting 에 대응하는 페이지도 만들고 싶다! 라고 하면
+/pages/search 폴더 아래에 setting.tsx라는 파일을 새롭게 추가해주면됨
+물론 /pages(폴더)/search(폴더)/setting(폴더) 이렇게 해도됨 이렇게 되면 setting 폴더 아래에 index.tsx로 만들어 주면 된다~
+
+페이지 라우터는 Pages 라는 폴더 아래에 원하는 대로 폴더나 파일들을 중첩해서 연이어 이어지는 
+중첩 경로도 쉽게 라우팅 할 수 있다~~
+
+보통 서치페이지에서는 /search?q=검색어 이런식으로 쿼리스트링 형태로 전달함 
+그래서 전달되는 쿼리스트링에 대한 설정들은 어떻게 할수있냐면
+쿼리스트링 자체는 경로의 끝에 물음표와 함께 명시되는 값인 만큼 페이지 자체에는 영향을 주진 않음
+
+그래서 Next.js 프로젝트에서도 서치페이지가 쿼리스트링을 쓰는 페이지라고 해서 
+폴더 구조를 따로 변경해야된다거나 그런건 없음
+
+대신에 이런 식으로 전달된 쿼리스트링 값을 서치페이지 컴포넌트에서 직접 째와서 사용하려면
+파일 최상단에 import useRouter 라는 훅을 Next/Router라는 패키지로부터 불러와주면됨
+import { useRouter } from "next/router";
+자동추천되는 임포트가 넥스트라우터, 넥스트네비게이션이 있는데 네비게이션은 approuter에서 사용되는거임
+
+useRouter는 이름 그대로 그냥 router라는 객체를 컴포넌트 내부에서 사용할 수 있도록 반환해주는 함수임
+  const router = useRouter();
+router라는 변수에 결과 값을 저장해주면 해당 변수안에 router 객체가 저장됨
+
+router객체에는 우리에게 필요한 라우팅과 관련된 정보가 저장되어 있음
+/search?q=검색어 이렇게 하고 console에 찍어보면
+객체 안에
+query : {q: '검색어'} 이렇게 들어가있음
+
+  const router = useRouter();
+
+  const q = router.query.q;
+
+이렇게 하면 이제 query 스트링의 값을 꺼내와서 사용할 수가 있음 
+또는 구조분해할당으로
+  const router = useRouter();
+
+  const { q } = router.query;
+이렇게 깔끔하게 꺼내와도 됨
+
+쿼리스트링은 페이지의 경로에는 영향을 주지 않기 때문에 넥스트 프로젝트에 별도의 특별한 설정을 해줄건 없음
+
+대신 컴포넌트 내부에 쿼리스트링의 값을 읽어내기 위해서 useRouter라는 훅을 불러와서 쓸 수 있다!
+
+book페이지를 만들건데 book페이지는 /book/100 이런 동적 경로를 사용함
+이때 사용하는 가변적인 값들을(100,1..) URL파라미터 라고 부름 
+이렇게 URL 파라미터를 사용하는 동적 경로를 갖는 페이지를 생성하려면 
+먼저 book이라는 경로에 맞춰서 book폴더를 만들어줌
+해당 폴더 아래에 [id].tsx라는 이름으로 파일을 만들어주면됨
+
+넥스트는 [id].tsx 대괄호가 포함된 파일명을 보고 이 파일은 지금 /book/[id]라는 가변적인 값 URL파라미터를 갖는 동적 경로에 대응하는 파일이구나 라고 인식을 함!
+
+그리고 이때 /book/13 이렇게 전달된 url파라미터의 값을 페이지 컴포넌트에 꺼내와서 사용하려면 앞서 했던것 처럼 import useRouter라는 훅을 불러와서 이용해주면 됨
+  const router = useRouter();
+이렇게 불러와서 콘솔에 찍어보면 
+  query:{id:13} 이런식으로 전달이 잘 된걸 볼 수 있음
+id라고 저장되는 이유는 우리가 pages폴더 아래에 페이지에 대응할 파일의 이름을 정할 때 [id].tsx라는 이름으로 만들어 두었기 때문에!
+  const router = useRouter();
+  const { id } = router.query;
+이런식으로 사용하면 됨
+
+만약에 book뒤에 지금처럼 id값 하나만 나오고 끝나는 구조가 아니라
+id가 두개가 연속으로 나온다거나 /book/11/22
+또는 id가 굉장히 여러개가 나오는 /book/11/22/33/ 이런 경로를 갖고있는 페이지라면?
+[id].tsx 파일은 /book 경로 뒤에 딱 하나의 아이디 값만 전달이 되는 경로에만 대응이 되도록 동작하기 때문에 지금처럼 여러개 아이디가 전달되는 경로에는 대응하지 못하는거임 
+이때 만약에 이러한 경로에도 대응하는 좀 더 범용적인 페이지를 만들고 싶다면 
+[id].tsx를 [...id].tsx로 변경하면됨
+이때 ... 은 book이라는 경로 뒤에 여러개의 id가 연달아 들어올 수 있다
+그러한 모든 id에 다 대응하겠다!
+catch all segment(구간) 모든걸 다 잡아내겠다~
+모든 구간에 다 대응하는 페이지를 만들겠다!
+
+book/123/456/789 이렇게 전달된 url파라미터들은 컴포넌트에 id라는 변수에 배열형태로 저장됨
+['123','456','789'] 이렇게 배열형태로 여러개의 id가 전달이 되어있음
+
+/book 의 index경로로 요청이 오면 아무리 캐치 올 세그먼트라고 해도 대응을 할 수가 없음
+캐치 올 세그먼트는 뒤에 뭐라도 나와야 대응이 되는 경로라서!
+
+지금은 /book으로 끝나버리는 경로로 요청을 했기 때문에 404가 뜸
+이런 경우에는 그냥 index.tsx를 추가하면 됨 근데 이렇게 하기 싫고!!
+그냥 id라는 파일이 좀 더 범용적으로 대응이 됐으면 좋겠다 라면
+[]대괄호로 한번 더 감싸주면 됨
+[[...id]].tsx 이렇게 
+캐치올세그먼트로 설정된 페이지를 대괄호로 한 번만 더 감싸주면 이 페이지는 /book 에도 대응하는 범용적인 페이지로 진화하게 됨
+
+이렇게 설정된 페이지를 옵셔널 캐치 올 세그먼트 (Optional Catch All Segment)라고 부름 
+이 파일은 /book 뒤에 뭐가 들어오든 안들어오든 다 대응이 된다~ 라고 알아두면 됨
+
+404페이지 만들기 
+pages폴더 아래에 404.tsx라는 파일을 만들면 됨
