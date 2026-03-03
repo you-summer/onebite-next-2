@@ -3,16 +3,20 @@ import style from "./index.module.css";
 import { ReactNode } from "react";
 import books from "@/mock/books.json"; // @기호는 src
 import BookItem from "@/components/book-item";
-import { InferGetServerSidePropsType } from "next";
+import { InferGetServerSidePropsType, InferGetStaticPropsType } from "next";
 import fetchBooks from "@/lib/fetch-books";
 import fetchRandomBooks from "@/lib/fetch-random-books";
 
 // 이 한줄로 ssr이 설정됨
-export const getServerSideProps = async () => {
-  // 컴포넌트보다 먼저 실행되어서, 컴포넌트에 필요한 데이터 불러오는 함수
+// export const getServerSideProps = async () => {
+// 컴포넌트보다 먼저 실행되어서, 컴포넌트에 필요한 데이터 불러오는 함수
 
-  // const allBooks = await fetchBooks();
-  // const recoBooks = await fetchRandomBooks();
+// const allBooks = await fetchBooks();
+// const recoBooks = await fetchRandomBooks();
+
+export const getStaticProps = async () => {
+  // getStaticProps로 바꾸면 SSG가 됨
+  console.log("인덱스 페이지");
 
   const [allBooks, recoBooks] = await Promise.all([
     fetchBooks(),
@@ -30,7 +34,7 @@ export const getServerSideProps = async () => {
 export default function Home({
   allBooks,
   recoBooks,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <div className={style.container}>
       <section>
