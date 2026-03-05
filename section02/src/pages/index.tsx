@@ -6,6 +6,7 @@ import BookItem from "@/components/book-item";
 import { InferGetServerSidePropsType, InferGetStaticPropsType } from "next";
 import fetchBooks from "@/lib/fetch-books";
 import fetchRandomBooks from "@/lib/fetch-random-books";
+import Head from "next/head";
 
 // 이 한줄로 ssr이 설정됨
 // export const getServerSideProps = async () => {
@@ -16,7 +17,7 @@ import fetchRandomBooks from "@/lib/fetch-random-books";
 
 export const getStaticProps = async () => {
   // getStaticProps로 바꾸면 SSG가 됨
-  console.log("인덱스 페이지");
+  // console.log("인덱스 페이지");
 
   const [allBooks, recoBooks] = await Promise.all([
     fetchBooks(),
@@ -28,6 +29,7 @@ export const getStaticProps = async () => {
       allBooks,
       recoBooks,
     },
+    // revalidate: 3,
   };
 };
 
@@ -36,20 +38,31 @@ export default function Home({
   recoBooks,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
-    <div className={style.container}>
-      <section>
-        <h3>지금 추천하는 도서</h3>
-        {recoBooks.map((book) => {
-          return <BookItem key={book.id} {...book} />;
-        })}
-      </section>
-      <section>
-        <h3>등록된 모든 도서</h3>
-        {allBooks.map((book) => {
-          return <BookItem key={book.id} {...book} />;
-        })}
-      </section>
-    </div>
+    <>
+      <Head>
+        <title>한입북스</title>
+        <meta property="og:image" content="/thumbnail.png" />
+        <meta property="og:title" content="한입북스" />
+        <meta
+          property="og:description"
+          content="한입북스에 등록된 도서들을 만나보세요"
+        />
+      </Head>
+      <div className={style.container}>
+        <section>
+          <h3>지금 추천하는 도서</h3>
+          {recoBooks.map((book) => {
+            return <BookItem key={book.id} {...book} />;
+          })}
+        </section>
+        <section>
+          <h3>등록된 모든 도서</h3>
+          {allBooks.map((book) => {
+            return <BookItem key={book.id} {...book} />;
+          })}
+        </section>
+      </div>
+    </>
   );
 }
 

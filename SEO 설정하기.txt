@@ -1,0 +1,35 @@
+SEO 설정하기
+
+썸네일과 파비콘 -> 퍼블릭폴더로!
+favicon.ico 로 설정해서 public 폴더로 집어 넣으면됨
+
+index.tsx
+
+넥스트에서는 리액트와 달리 각 페이지별로 메타 태그를 별도로 설정해줄수있음
+
+import Head from "next/head";
+이렇게 Head라는 컴포넌트를 불러와야함
+
+불러왔다면 Page컴포넌트의 리턴문 안에 <></>빈 태그 안에 <Head></Head>를 불러오고
+헤드 컴포넌트 내부에 기존 HTML 메타 태그들을 작성하듯이 원하는 태그를 작성해주면됨
+
+      <Head>
+        <title>한입북스</title>
+      </Head>
+넥스트 앱에서는 Head라는 컴포넌트를 통해서 페이지별로 필요한 타이틀이나 메타 태그를 별도로 설정해줄수있음
+
+인덱스 페이지가 링크로써 카카오톡이나 페북같은 SNS에 공유될 때 필요한 썸네일이나 타이틀, 디스크립션등의 오픈 그래프 태그까지 함께 설정해볼것
+
+        <meta property="og:image" content="/thumbnail.png" />
+프로퍼티로 og:image 썸네일을 설정하는 태그다! 라는걸 알려주고
+컨텐츠로 /thumbnail.png로 썸네일을 알려줌 
+/ 의 의미는 프로젝트의 퍼블릭 디렉토리를 의미하는거임
+
+        <meta property="og:title" content="한입북스" />
+타이틀 설정
+        <meta
+          property="og:description"
+          content="한입북스에 등록된 도서들을 만나보세요"
+        />
+
+book페이지 [id].tsx 는 다이나믹한 ssg 페이지, 동적경로를 갖는 ssg페이지라는걸 알수있음
